@@ -26,6 +26,7 @@ func main() {
 	r.HandleFunc("/signup", Api.SignUp).Methods(http.MethodPost)
 	// r.HandleFunc("/users", Api.GetUsers).Methods(http.MethodGet)
 	r.HandleFunc("/login", Api.Login).Methods(http.MethodPost)
+	r.Handle("/movies/upsert", authMiddle.IsAuthorized(http.HandlerFunc(Api.UpsertMovies))).Methods(http.MethodPost)
 	fmt.Printf("Starting server at port 8000\n")
 	log.Fatal(http.ListenAndServe(":8000",r))
 	

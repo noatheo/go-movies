@@ -35,8 +35,8 @@ type UserTable struct {
 type MovieTable struct {
 	MID string        `json:"mid"`
     Title string      `json:"title"`
-	Overview string    `json:"type"`
-	Release_date string `json:"director"`
+	Overview string    `json:"overview"`
+	Release_date string `json:"release_date"`
     Rating string   `json:"rating"`
 }
 
@@ -217,50 +217,23 @@ func LoginUser(user *UserTable) (string, error){
 
 }
 
-func UpdateToken(Token string , uid string) error {
+
+
+func Upsert(movies []*MovieTable) ([]sql.Result , error)  {
     DB := Connect(DSN)
-	query := "UPDATE users SET   token=$2 WHERE uid = $3 "
-	
-    _, err := DB.Exec(query,   &Token , &uid )
-    if err != nil {
-        return fmt.Errorf("%v",  err)
+
+    query := "INSERT INTO movies(mid , title , overview , release_date, rating) VALUES ($1 ,$2 ,$3 ,$4 ,$5) ON CONFLICT (mid) DO UPDATE SET title = EXCLUDED.title , overview = EXCLUDED.overview , release_date = EXCLUDED.release_date , rating = EXCLUDED.rating "
+    var results []sql.Result  
+    for i := 0 ; i < len(movies); {
+       // mid,_ := strconv.ParseInt(movie[i].MID , 10 ,64 )
+        Result, err := DB.Exec(query, movies[i].MID, movies[i].Title, movies[i].Overview, movies[i].Release_date ,movies[i].Rating)
+        if err != nil {
+            return nil, fmt.Errorf("%v",  err)
+        }
+        results = append(results , Result)
+        i++
     }
 
-    return nil
+    return results , nil
 
 }
-
-// func Read() ([]UserTable , error){
-// 	DB := Connect(DSN)
-// 	var table []UserTable 
-//     query := "SELECT * FROM users"
-//     rows, err := DB.Query(query)
-//     if err != nil {
-//         return nil, fmt.Errorf("%v",  err)
-//     }
-
-
-//     defer rows.Close()
-//     // Loop through rows, using Scan to assign column data to struct fields.
-
-//     for rows.Next() {
-//         var column UserTable
-//         if err := rows.Scan(&column.UID, &column.Username, &column.Password, &column.Email , &column.Created_on, &column.Token ); err != nil {
-//             return nil, fmt.Errorf(" %v",  err)
-//         }
-//         table = append(table, column)
-//     }
-
-//     if err := rows.Err(); err != nil {
-//         return nil, fmt.Errorf("%v",  err)
-//     }
-// 	fmt.Println(table)
-//     return table, nil
-// }
-
-
-
-
-
-
-

@@ -9,10 +9,14 @@ import (
 	_"log"
 	"github.com/gorilla/mux"
 	"github.com/noatheo/movies/store"
+	"fmt"
 	
 )
 
+type LoginToken struct {
+	Token string   `json:"token"`
 
+}
 
 func GetMovies(w http.ResponseWriter, r *http.Request )  {
 	w.Header().Set("Content-Type", "application/json")
@@ -115,21 +119,48 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 	Result, err := store.LoginUser(&user)
 	// Token, err2 := json.Marshal(Result)
 	// fmt.Println(Token)
+	var result LoginToken
+	result.Token = Result
 	
     if err != nil  {
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		// http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(Result)
+	R, err2 := json.Marshal(result)
+	w.Write(R)
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+
+
+	
      
  }
 
-// func GetUsers(w http.ResponseWriter, r *http.Request ) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	test, err := store.Read()
-// 	fmt.Println(err)
-// 	json.NewEncoder(w).Encode(test)
-	
-// }
+
+func UpsertMovies(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader( http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var movie []*store.MovieTable
+	_ = json.NewDecoder(r.Body).Decode(&movie)
+	//fmt.Println(movie)
+    fmt.Println("no")
+	Results, err := store.Upsert(movie)
+	if err != nil {
+		
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		
+		return
+
+	}
+
+ json.NewEncoder(w).Encode(Results)
+
+
+}
 

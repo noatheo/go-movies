@@ -170,7 +170,7 @@ func UpdateMovie(midold string ,movie *MovieTable) ( sql.Result , error ) {
 
 func SignUpUser(user *UserTable ) (sql.Result , error) {
 	DB := Connect(DSN)
-	query := "INSERT INTO users(uid , username , user_password , email ,created_on) VALUES ($1 ,$2 ,$3 ,$4 ,$5 )"
+	query := "INSERT INTO users(uid , username , user_password , email ,created_on) VALUES ($1 ,$2 ,crypt($3, gen_salt('md5')) ,$4 ,$5 )"
 	uid, _ := strconv.ParseInt(user.UID , 10 ,64 )
 	created_on := time.Now()
     Result, err := DB.Exec(query, &uid, user.Username , user.Password , user.Email , &created_on  )
@@ -184,32 +184,25 @@ func SignUpUser(user *UserTable ) (sql.Result , error) {
 
 func LoginUser(user *UserTable) (string, error){
     DB := Connect(DSN)
-    query := "SELECT uid, email, user_password FROM users WHERE email=$1 "
-    row  := DB.QueryRow(query, user.Email)
-    passwordCheck := user.Password
+    queryPassword := "SELECT (user_password = crypt($1 , (SELECT user_password FROM users WHERE email = $2))) AS passowrd_match FROM users WHERE email= $3"
+    row  := DB.QueryRow(queryPassword, user.Password , user.Email , user.Email)
    
     
     
-	if err := row.Scan(&user.UID, &user.Email ,&user.Password ); err != nil {
+	if err := row.Scan(&user.Token ); err != nil {
 		return user.Token.String , fmt.Errorf("%v",  err)
 	}
-
-    if passwordCheck != user.Password {
-        return "Wrong Password" , fmt.Errorf("please try again")
+    if user.Token.String != "true" {
+        return "Wrong Password, please try again" , fmt.Errorf("unauthorized access")
     }
     var Token string
     var err error
     
     
-    if user.Token.Valid == false {
-        Token, err  = auth.GenJwt(user.Email)
-        if err != nil {
-            return "", err
-        }       
-    
-    } else {
-        Token = user.Token.String
-    }
+    Token, err  = auth.GenJwt(user.Email)
+    if err != nil {
+        return "", err
+    }    
     
 
     return Token , nil

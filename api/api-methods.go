@@ -27,7 +27,14 @@ func GetMovies(w http.ResponseWriter, r *http.Request )  {
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		return
 	}
-	json.NewEncoder(w).Encode(test)
+	R, err2 := json.Marshal(test)
+	
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(R)
 	
 	
 	
@@ -45,7 +52,14 @@ func GetMovie(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		return
 	}
-	json.NewEncoder(w).Encode(Result)
+	R, err2 := json.Marshal(Result)
+	
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(R)
 	
 }
 
@@ -61,7 +75,14 @@ func DeleteMovie(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	json.NewEncoder(w).Encode(Result)
+	R, err2 := json.Marshal(Result)
+	
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(R)
 }
 
 
@@ -77,7 +98,14 @@ func CreateMovie(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		return
 	}
-	json.NewEncoder(w).Encode(Result)
+	R, err2 := json.Marshal(Result)
+	
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(R)
 
 }
 
@@ -93,7 +121,14 @@ func UpdateMovie(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		return
 	}
-	json.NewEncoder(w).Encode(Result)
+	R, err2 := json.Marshal(Result)
+	
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(R)
 
 
 }
@@ -108,7 +143,14 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		return
 	}
-	json.NewEncoder(w).Encode(Result)
+	R, err2 := json.Marshal(Result)
+	
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(R)
 }
 
  func Login(w http.ResponseWriter, r *http.Request) {
@@ -128,12 +170,13 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	R, err2 := json.Marshal(result)
-	w.Write(R)
+	
 	if err2 != nil  {
 		http.Error(w, err.Error(), http.StatusInternalServerError )
 		// http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Write(R)
 
 
 	
@@ -159,7 +202,14 @@ func UpsertMovies(w http.ResponseWriter, r *http.Request) {
 
 	}
 
- json.NewEncoder(w).Encode(Results)
+	R, err2 := json.Marshal(Results)
+	if err2 != nil  {
+		http.Error(w, err.Error(), http.StatusInternalServerError )
+		// http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(R)
 
 
 }
